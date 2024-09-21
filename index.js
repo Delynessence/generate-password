@@ -19,10 +19,11 @@ rl.question("\nMasukkan panjang password: ", function(length) {
                 const includeUppercase = incUppercase.toLowerCase() === 'y';
                 const includeSpecial = incSpecial.toLowerCase() === 'y';
 
-                const { password, executionTime } = generatePassword(parseInt(length), includeNumbers, includeUppercase, includeSpecial);
-
+                const { password, iterations, executionTime } = generatePassword(parseInt(length), includeNumbers, includeUppercase, includeSpecial);
 
                 console.log("\nPassword yang dihasilkan: ", password);
+                console.log("Jumlah perulangan brute-force: ", iterations);
+                console.log(`Waktu eksekusi: ${executionTime.toFixed(2)} ms`);
                 console.log("\n");
 
                 rl.close();
@@ -55,11 +56,17 @@ function generatePassword(length, includeNumbers, includeUppercase, includeSpeci
 
     let password = '';
     let found = false;
+    let iterations = 0;
+    const startTime = performance.now();
 
     while (!found) {
         password = bruteForce();
         found = validatePassword(password, includeNumbers, includeUppercase, includeSpecial);
+        iterations++;
     }
+
+    const endTime = performance.now();
+    const executionTime = endTime - startTime;
 
     function validatePassword(password, includeNumbers, includeUppercase, includeSpecial) {
         let hasLower = /[a-z]/.test(password);
@@ -70,5 +77,5 @@ function generatePassword(length, includeNumbers, includeUppercase, includeSpeci
         return hasLower && hasNumber && hasUpper && hasSpecial;
     }    
 
-    return { password };
+    return { password, iterations, executionTime };
 }
